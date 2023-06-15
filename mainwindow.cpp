@@ -34,6 +34,8 @@ void MainWindow::autoPlay()
 
 void MainWindow::playNextSong()
 {
+    if(queueNames.size() == 1)
+        generateQueue();
     previousSongs.append(songName);
     songName = queueNames.takeFirst();
     delete ui->QueueList->takeItem(0);
@@ -134,7 +136,6 @@ void MainWindow::on_MusicList_itemDoubleClicked(QListWidgetItem *item)
     if(!isPlaying)
     {
         if (songName.isEmpty())
-
             setupPlayer();
         songName = item->text();
         generateQueue();
