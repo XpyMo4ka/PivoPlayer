@@ -60,7 +60,7 @@ void MainWindow::on_pauseButton_clicked()
         else
         {
             player->play();
-            //imer->start(500);
+            timer->start(500);
             isPlaying = true;
         }
     }
@@ -72,7 +72,6 @@ void MainWindow::on_pauseButton_clicked()
         queueNames.pop_front();
         delete ui->QueueList->takeItem(0);
         playSong();
-
     }
 }
 

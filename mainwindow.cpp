@@ -110,9 +110,11 @@ void MainWindow::updateTimingLabels()
     QString formattedCurrentTiming = currentTiming.toString("mm:ss");
     QTime timeLeft_ = QTime(0, 0, 0).addMSecs(timeLeft);               //format time left
     QString formattedTimeLeft = timeLeft_.toString("-mm:ss");
-
-    timingLabel->setText(formattedCurrentTiming);
-    timeLeftLabel->setText(formattedTimeLeft);
+    if(!isSliderPressed)
+    {
+        timingLabel->setText(formattedCurrentTiming);
+        timeLeftLabel->setText(formattedTimeLeft);
+    }
 }
 
 void MainWindow::setupPlayer()
@@ -174,7 +176,7 @@ void MainWindow::updateSliderPosition()
     songDuration = player->duration();
     ui->TimingSlider->setMaximum(songDuration);
 
-    if (!isSliderPressed && isPlaying) {
+    if (!isSliderPressed &&  isPlaying) {
         qint64 position = player->position();
         ui->TimingSlider->setValue(position);
     }
@@ -217,7 +219,7 @@ void MainWindow::on_TimingSlider_sliderReleased()
 
 void MainWindow::on_TimingSlider_sliderMoved(int position)
 {
-    if(!isPlaying && songName!=nullptr)
+    if(songName!=nullptr)
     {
         qint64 currentSongTiming = position;
         qint64 timeLeft = player->duration() - position;
@@ -228,9 +230,12 @@ void MainWindow::on_TimingSlider_sliderMoved(int position)
 
         timingLabel->setText(formattedCurrentTiming);
         timeLeftLabel->setText(formattedTimeLeft);
-        player->setPosition(position);
+        if(!isPlaying)
+            player->setPosition(position);
     }
 }
+
+
 
 
 void MainWindow::on_volumeSlider_valueChanged(int value)
