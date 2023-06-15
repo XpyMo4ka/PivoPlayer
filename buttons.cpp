@@ -30,6 +30,14 @@ void MainWindow::on_repeatButton_toggled(bool checked)
 void MainWindow::on_shuffleButton_toggled(bool checked)
 {
     isShuffle = checked;
+    if(!queueNames.isEmpty())
+        shuffleQueue();
+    if(!checked)
+    {
+        ui->QueueList->clear();
+        queueNames.clear();
+        generateQueue();
+    }
 }
 
 void MainWindow::on_prevButton_clicked()

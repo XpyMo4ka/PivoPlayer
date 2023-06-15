@@ -17,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(timer, &QTimer::timeout, this, &MainWindow::updateSliderPosition);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateTimingLabels);
     connect(timer, &QTimer::timeout, this, &MainWindow::autoPlay);
-    connect(ui->MusicList, &QListWidget::customContextMenuRequested, this, &MainWindow::on_MusicList_customContextMenuRequested);
 
     isSliderPressed = false;
 }
@@ -38,11 +37,18 @@ void MainWindow::autoPlay()
 void MainWindow::playNextSong()
 {
     if(queueNames.size() == 1)
-        generateQueue();
+    {
+        if(isLoop)
+            generateQueue();
+
+    }
+    if(!queueNames.isEmpty())
+    {
     previousSongs.append(songName);
     songName = queueNames.takeFirst();
     delete ui->QueueList->takeItem(0);
     playSong();
+    }else if(isLoop) generateQueue();
 }
 
 void MainWindow::playPrevSong()
@@ -50,10 +56,22 @@ void MainWindow::playPrevSong()
     if(!previousSongs.empty())
     {
         ui->QueueList->insertItem(0, previousSongs.back());
-        songName = previousSongs.back();
+        queueNames.push_front(songName);
+        queueNames.push_front(previousSongs.back());
+        songName = queueNames.takeFirst();
         previousSongs.pop_back();
         playSong();
     }
+}
+
+void MainWindow::shuffleQueue()
+{
+    shuffledQueueNames = queueNames;
+    QList<QString>::Iterator begin = shuffledQueueNames.begin();
+    QList<QString>::Iterator end = shuffledQueueNames.end();
+    ui->QueueList->clear();
+    std::random_shuffle(begin, end);
+    ui->QueueList->addItems(shuffledQueueNames);
 }
 
 void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
@@ -147,6 +165,8 @@ void MainWindow::generateQueue()
             ui->QueueList->addItem(fileName);
         }
     }
+    if(isShuffle)
+        shuffleQueue();
 }
 
 void MainWindow::updateSliderPosition()

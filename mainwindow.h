@@ -3,6 +3,7 @@
 
 #include "qlabel.h"
 #include "qlistwidget.h"
+#include "QList"
 #include <QMainWindow>
 #include <QMediaPlayer>
 #include <QAudioOutput>
@@ -21,13 +22,13 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
     QLabel *timingLabel;
     QLabel *timeLeftLabel;
     QLabel *songnameLabel;
 private slots:
-
-
     void on_MusicList_itemDoubleClicked(QListWidgetItem *item);
+    void on_MusicList_customContextMenuRequested(const QPoint& pos);
 
     void on_repeatButton_toggled(bool checked);
     void on_shuffleButton_toggled(bool checked);
@@ -36,43 +37,46 @@ private slots:
     void on_nextButton_clicked();
     void on_addMusicButton_clicked();
 
-
     void on_TimingSlider_sliderPressed();
-
     void on_TimingSlider_sliderReleased();
-
     void on_TimingSlider_sliderMoved(int position);
 
     void on_volumeSlider_valueChanged(int value);
-
 private:
     QTimer *timer;
     void updateTimingLabels();
-    bool isSliderPressed;
     void updateSliderPosition();
+
     qint64 songDuration;
 
     Ui::MainWindow *ui;
 
     QStringList queueNames;
+    QStringList shuffledQueueNames;
+    QStringList previousSongs;
     void generateQueue();
+    void shuffleQueue();
+    QListWidgetItem* firstQueueItem;
+
+    QDir musicDir;
+    QStringList getSongNamesFromFolder();
+    QStringList filters;
 
     QString songName;
-    QStringList previousSongs;
+
     void playPrevSong();
-    void autoPlay();
     void playNextSong();
-    void setupPlayer();
-    void on_MusicList_customContextMenuRequested(const QPoint& pos);
+    void autoPlay();
     void playSong();
-    QStringList getSongNamesFromFolder();
-    QDir musicDir;
-    QStringList filters;
+
+    void setupPlayer();
+
     QMediaPlayer *player;
     QAudioOutput *audioOutput;
-    QListWidgetItem* firstQueueItem;
+
     bool isPlaying = false;
     bool isShuffle = false;
     bool isLoop = false;
+    bool isSliderPressed;
 };
 #endif // MAINWINDOW_H
