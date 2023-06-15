@@ -52,9 +52,19 @@ void MainWindow::on_pauseButton_clicked()
         else
         {
             player->play();
-            timer->start(500);
+            //imer->start(500);
             isPlaying = true;
         }
+    }
+    else if (!queueNames.empty())
+    {
+        setupPlayer();
+        songName = queueNames.first();
+        generateQueue();
+        queueNames.pop_front();
+        delete ui->QueueList->takeItem(0);
+        playSong();
+
     }
 }
 

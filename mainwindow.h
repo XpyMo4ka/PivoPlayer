@@ -63,6 +63,7 @@ private:
     void autoPlay();
     void playNextSong();
     void setupPlayer();
+    void on_MusicList_customContextMenuRequested(const QPoint& pos);
     void playSong();
     QStringList getSongNamesFromFolder();
     QDir musicDir;

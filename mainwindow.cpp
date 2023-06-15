@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->MusicList->addItems(getSongNamesFromFolder());
+    ui->MusicList->setContextMenuPolicy(Qt::CustomContextMenu);
 
     timingLabel = findChild<QLabel *>("timing_label");
     timeLeftLabel = findChild<QLabel *>("timeleft_label");
@@ -16,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(timer, &QTimer::timeout, this, &MainWindow::updateSliderPosition);
     connect(timer, &QTimer::timeout, this, &MainWindow::updateTimingLabels);
     connect(timer, &QTimer::timeout, this, &MainWindow::autoPlay);
+    connect(ui->MusicList, &QListWidget::customContextMenuRequested, this, &MainWindow::on_MusicList_customContextMenuRequested);
+
     isSliderPressed = false;
 }
 
@@ -51,6 +54,32 @@ void MainWindow::playPrevSong()
         previousSongs.pop_back();
         playSong();
     }
+}
+
+void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
+{
+    QListWidgetItem* selectedItem = ui->MusicList->itemAt(pos);
+
+     if (selectedItem && selectedItem->listWidget() == ui->MusicList) {
+         // Создаем контекстное меню
+         QMenu contextMenu(this);
+
+         // Добавляем действия в контекстное меню
+         QAction* action1 = contextMenu.addAction("Add to queue");
+         //QAction* action2 = contextMenu.addAction("Действие 2");
+
+         // Показываем контекстное меню в позиции курсора
+         QAction* selectedAction = contextMenu.exec(ui->MusicList->viewport()->mapToGlobal(pos));
+
+         // Обрабатываем выбранное действие
+         if (selectedAction == action1) {
+             ui->QueueList->insertItem(0, selectedItem->text());
+             queueNames.push_front(selectedItem->text());
+
+         } /*else if (selectedAction == action2) {
+             // Действие 2
+         }*/
+     }
 }
 
 void MainWindow::updateTimingLabels()
