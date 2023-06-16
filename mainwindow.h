@@ -43,6 +43,8 @@ private slots:
     void on_TimingSlider_sliderMoved(int position);
 
     void on_volumeSlider_valueChanged(int value);
+    void on_pushButton_clicked();
+
 private:
     QTimer *timer;
     void updateTimingLabels();
@@ -84,5 +86,7 @@ private:
     bool isShuffle = false;
     bool isLoop = false;
     bool isSliderPressed;
+
+    void SetPivo(QObject* object, const QString& imagePath);
 };
 #endif // MAINWINDOW_H

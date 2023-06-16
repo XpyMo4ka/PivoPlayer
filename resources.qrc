@@ -1,5 +1,8 @@
 <RCC>
     <qresource>
         <file>settings.ini</file>
+		<file>pivo/taras.png</file>
+		<file>pivo/6kg.png</file>
+		<file>pivo/pivo.png</file>
     </qresource>
 </RCC>

@@ -258,3 +258,9 @@ void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
      }
 }
 
+
+
+
+
+
+
