@@ -3,6 +3,7 @@
 
 void MainWindow::on_addMusicButton_clicked()
 {
+
     QStringList windowName = QFileDialog::getOpenFileNames(this, "Выберите музыкальные файлы", QDir::homePath(), "Музыкальные файлы (*.mp3 *.wav)");
 
     // Копирование выбранных файлов в папку "musicfiles"

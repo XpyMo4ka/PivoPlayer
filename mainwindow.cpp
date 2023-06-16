@@ -36,26 +36,29 @@ void MainWindow::autoPlay()
 
 void MainWindow::playNextSong()
 {
-    if(queueNames.size() == 1)
-    {
-        if(isLoop)
-            generateQueue();
-
-    }
     if(!queueNames.isEmpty())
     {
-    previousSongs.append(songName);
-    songName = queueNames.takeFirst();
-    delete ui->QueueList->takeItem(0);
-    playSong();
-    }else if(isLoop) generateQueue();
+        previousSongs.append(songName);
+        songName = queueNames.takeFirst();
+        delete ui->QueueList->takeItem(0);
+        playSong();
+    }
+    else if(isLoop)
+    {
+        generateQueue();
+        queueNames.append(songName);
+        ui->QueueList->addItem(songName);
+        if(isShuffle)
+            shuffleQueue();
+        playNextSong();
+    }
 }
 
 void MainWindow::playPrevSong()
 {
     if(!previousSongs.empty())
     {
-        ui->QueueList->insertItem(0, previousSongs.back());
+        ui->QueueList->insertItem(0, songName);
         queueNames.push_front(songName);
         queueNames.push_front(previousSongs.back());
         songName = queueNames.takeFirst();
@@ -66,38 +69,14 @@ void MainWindow::playPrevSong()
 
 void MainWindow::shuffleQueue()
 {
-    shuffledQueueNames = queueNames;
+    shuffledQueueNames = getSongNamesFromFolder();
+    shuffledQueueNames.contains(songName);
     QList<QString>::Iterator begin = shuffledQueueNames.begin();
     QList<QString>::Iterator end = shuffledQueueNames.end();
     ui->QueueList->clear();
     std::random_shuffle(begin, end);
     ui->QueueList->addItems(shuffledQueueNames);
-}
-
-void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
-{
-    QListWidgetItem* selectedItem = ui->MusicList->itemAt(pos);
-
-     if (selectedItem && selectedItem->listWidget() == ui->MusicList) {
-         // Создаем контекстное меню
-         QMenu contextMenu(this);
-
-         // Добавляем действия в контекстное меню
-         QAction* action1 = contextMenu.addAction("Add to queue");
-         //QAction* action2 = contextMenu.addAction("Действие 2");
-
-         // Показываем контекстное меню в позиции курсора
-         QAction* selectedAction = contextMenu.exec(ui->MusicList->viewport()->mapToGlobal(pos));
-
-         // Обрабатываем выбранное действие
-         if (selectedAction == action1) {
-             ui->QueueList->insertItem(0, selectedItem->text());
-             queueNames.push_front(selectedItem->text());
-
-         } /*else if (selectedAction == action2) {
-             // Действие 2
-         }*/
-     }
+    queueNames = shuffledQueueNames;
 }
 
 void MainWindow::updateTimingLabels()
@@ -126,8 +105,6 @@ void MainWindow::setupPlayer()
     ui->volumeSlider->setValue(audioOutput->volume()*100);
 }
 
-
-
 void MainWindow::playSong()
 {
     isPlaying = true;
@@ -136,26 +113,6 @@ void MainWindow::playSong()
     player->play();
     timer->start(500);
 }
-
-QStringList MainWindow::getSongNamesFromFolder()
-{
-
-    QStringList fileNames;
-    filters << "*.mp3" << "*.waw";
-      //только файлы
-    QDir musicDir("music");
-    musicDir.setNameFilters(filters);
-    musicDir.setFilter(QDir::Files);
-    QFileInfoList fileInfoList = musicDir.entryInfoList();
-        //получение названий
-        foreach (const QFileInfo& fileInfo, fileInfoList)
-        {
-            fileNames.append(fileInfo.fileName());
-        }
-        return fileNames;
-}
-
-
 
 void MainWindow::generateQueue()
 {
@@ -166,19 +123,6 @@ void MainWindow::generateQueue()
             queueNames.append(fileName);
             ui->QueueList->addItem(fileName);
         }
-    }
-    if(isShuffle)
-        shuffleQueue();
-}
-
-void MainWindow::updateSliderPosition()
-{
-    songDuration = player->duration();
-    ui->TimingSlider->setMaximum(songDuration);
-
-    if (!isSliderPressed &&  isPlaying) {
-        qint64 position = player->position();
-        ui->TimingSlider->setValue(position);
     }
 }
 
@@ -206,7 +150,6 @@ void MainWindow::on_TimingSlider_sliderPressed()
      isSliderPressed = true;
 }
 
-
 void MainWindow::on_TimingSlider_sliderReleased()
 {
     isSliderPressed = false;
@@ -215,7 +158,6 @@ void MainWindow::on_TimingSlider_sliderReleased()
         player->setPosition(position);
     }
 }
-
 
 void MainWindow::on_TimingSlider_sliderMoved(int position)
 {
@@ -235,12 +177,64 @@ void MainWindow::on_TimingSlider_sliderMoved(int position)
     }
 }
 
+void MainWindow::updateSliderPosition()
+{
+    songDuration = player->duration();
+    ui->TimingSlider->setMaximum(songDuration);
 
-
+    if (!isSliderPressed &&  isPlaying) {
+        qint64 position = player->position();
+        ui->TimingSlider->setValue(position);
+    }
+}
 
 void MainWindow::on_volumeSlider_valueChanged(int value)
 {
     float volume = value / 100.0;
     audioOutput->setVolume(volume);
+}
+
+QStringList MainWindow::getSongNamesFromFolder()
+{
+
+    QStringList fileNames;
+    filters << "*.mp3" << "*.waw";
+      //только файлы
+    QDir musicDir("music");
+    musicDir.setNameFilters(filters);
+    musicDir.setFilter(QDir::Files);
+    QFileInfoList fileInfoList = musicDir.entryInfoList();
+        //получение названий
+        foreach (const QFileInfo& fileInfo, fileInfoList)
+        {
+            fileNames.append(fileInfo.fileName());
+        }
+        return fileNames;
+}
+
+void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
+{
+    QListWidgetItem* selectedItem = ui->MusicList->itemAt(pos);
+
+     if (selectedItem && selectedItem->listWidget() == ui->MusicList) {
+         // Создаем контекстное меню
+        QMenu contextMenu(this);
+
+         // Добавляем действия в контекстное меню
+        QAction* action1 = contextMenu.addAction("Add to queue");
+         //QAction* action2 = contextMenu.addAction("Действие 2");
+
+         // Показываем контекстное меню в позиции курсора
+        QAction* selectedAction = contextMenu.exec(ui->MusicList->viewport()->mapToGlobal(pos));
+
+         // Обрабатываем выбранное действие
+        if (selectedAction == action1) {
+             ui->QueueList->insertItem(0, selectedItem->text());
+             queueNames.push_front(selectedItem->text());
+
+        } /*else if (selectedAction == action2) {
+             // Действие 2
+         }*/
+     }
 }
 
