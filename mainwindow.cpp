@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
     ui->MusicList->addItems(getSongNamesFromFolder());
     ui->MusicList->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -19,10 +20,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(timer, &QTimer::timeout, this, &MainWindow::autoPlay);
 
     isSliderPressed = false;
+    QString configPath = QCoreApplication::applicationDirPath() + "settings.ini";
+    settings = new QSettings(configPath, QSettings::IniFormat, this);
+    ui->songname_label->setText(settings->value("currentSong").toString());
 }
 
 MainWindow::~MainWindow()
 {
+    saveSettings();
     delete ui;
 }
 
@@ -83,7 +88,7 @@ void MainWindow::updateTimingLabels()
 {
 
 
-    qint64 currentSongTiming = player->position();
+    currentSongTiming = player->position();
     qint64 timeLeft = player->duration() - player->position();
     QTime currentTiming = QTime(0, 0, 0).addMSecs(currentSongTiming);  //format current time
     QString formattedCurrentTiming = currentTiming.toString("mm:ss");
@@ -98,11 +103,25 @@ void MainWindow::updateTimingLabels()
 
 void MainWindow::setupPlayer()
 {
+    setupSettings();
     player = new QMediaPlayer;
     audioOutput = new QAudioOutput;
     player->setAudioOutput(audioOutput);
-    audioOutput->setVolume(0.5);
+    audioOutput->setVolume(volume);
     ui->volumeSlider->setValue(audioOutput->volume()*100);
+}
+
+void MainWindow::setupSettings()
+{
+    volume = settings->value("volume").toReal();
+    songName = settings->value("currentSong").toString();
+}
+
+void MainWindow::saveSettings()
+{
+    settings->setValue("volume",volume);
+    settings->setValue("currentSong", songName);
+    settings->sync();
 }
 
 void MainWindow::playSong()
@@ -190,8 +209,9 @@ void MainWindow::updateSliderPosition()
 
 void MainWindow::on_volumeSlider_valueChanged(int value)
 {
-    float volume = value / 100.0;
-    audioOutput->setVolume(volume);
+    volume = value / 100.0;
+    audioOutput->setVolume(value / 100.0);
+
 }
 
 QStringList MainWindow::getSongNamesFromFolder()

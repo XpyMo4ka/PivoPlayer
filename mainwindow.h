@@ -4,6 +4,7 @@
 #include "qlabel.h"
 #include "qlistwidget.h"
 #include "QList"
+#include "QSettings"
 #include <QMainWindow>
 #include <QMediaPlayer>
 #include <QAudioOutput>
@@ -70,6 +71,11 @@ private:
     void playSong();
 
     void setupPlayer();
+    void setupSettings();
+    void saveSettings();
+    QSettings *settings;
+    float volume;
+    qint64 currentSongTiming;
 
     QMediaPlayer *player;
     QAudioOutput *audioOutput;

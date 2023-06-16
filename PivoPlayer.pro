@@ -6,6 +6,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++17
 
 INCLUDEPATH += $$PWD/music
+RESOURCES += resources.qrc
 
 SOURCES += \
     buttons.cpp \

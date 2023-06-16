@@ -74,6 +74,15 @@ void MainWindow::on_pauseButton_clicked()
         delete ui->QueueList->takeItem(0);
         playSong();
     }
+    else
+    {
+        setupPlayer();
+        if(songName != nullptr)
+        {
+            generateQueue();
+            playSong();
+        }
+    }
 }
 
 void MainWindow::on_nextButton_clicked()
