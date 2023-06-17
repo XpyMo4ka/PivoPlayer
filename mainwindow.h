@@ -43,7 +43,7 @@ private slots:
     void on_TimingSlider_sliderMoved(int position);
 
     void on_volumeSlider_valueChanged(int value);
-    void on_pushButton_clicked();
+    void on_QueueList_itemDoubleClicked(QListWidgetItem *item);
 
 private:
     QTimer *timer;
@@ -60,6 +60,7 @@ private:
     void generateQueue();
     void shuffleQueue();
     QListWidgetItem* firstQueueItem;
+    QStringList lastSongNames;
 
     QDir musicDir;
     QStringList getSongNamesFromFolder();
@@ -86,7 +87,5 @@ private:
     bool isShuffle = false;
     bool isLoop = false;
     bool isSliderPressed;
-
-    void SetPivo(QObject* object, const QString& imagePath);
 };
 #endif // MAINWINDOW_H

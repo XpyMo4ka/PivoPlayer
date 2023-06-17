@@ -70,6 +70,14 @@ void MainWindow::playPrevSong()
         previousSongs.pop_back();
         playSong();
     }
+    else if (isLoop)
+    {
+        if(lastSongNames.isEmpty())
+            lastSongNames = getSongNamesFromFolder();
+        songName = lastSongNames.last();
+        lastSongNames.pop_back();
+        playSong();
+    }
 }
 
 void MainWindow::shuffleQueue()
@@ -162,6 +170,22 @@ void MainWindow::on_MusicList_itemDoubleClicked(QListWidgetItem *item)
         songName = item->text();
         playSong();
     }
+}
+
+void MainWindow::on_QueueList_itemDoubleClicked(QListWidgetItem *item)
+{
+    int clickedIndex = ui->QueueList->row(item);
+    previousSongs.append(songName);
+    songName = item->text();
+
+    for (int i = 0; i < clickedIndex; i++)
+    {
+        previousSongs.append(ui->QueueList->takeItem(0)->text());
+        queueNames.removeFirst();
+    }
+    ui->QueueList->takeItem(0);
+    queueNames.removeFirst();
+    playSong();
 }
 
 void MainWindow::on_TimingSlider_sliderPressed()
@@ -257,9 +281,6 @@ void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
          }*/
      }
 }
-
-
-
 
 
 
