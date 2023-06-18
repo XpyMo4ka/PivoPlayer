@@ -4,7 +4,7 @@
 void MainWindow::on_addMusicButton_clicked()
 {
 
-    QStringList windowName = QFileDialog::getOpenFileNames(this, "Выберите музыкальные файлы", QDir::homePath(), "Музыкальные файлы (*.mp3 *.wav)");
+    QStringList windowName = QFileDialog::getOpenFileNames(this, "Выберите музыкальные файлы", pickPath, "Музыкальные файлы (*.mp3 *.wav)");
 
     // Копирование выбранных файлов в папку "musicfiles"
     QString destinationDir = "music";
@@ -13,12 +13,11 @@ void MainWindow::on_addMusicButton_clicked()
     foreach (QString fileName, windowName) {
         QFileInfo fileInfo(fileName);
         QString destinationFile = destinationDir + "/" + fileInfo.fileName();
-
+        pickPath = fileInfo.absoluteFilePath();
         if (QFile::copy(fileName, destinationFile)) {
             ui->MusicList->addItem(fileInfo.fileName());
         } else {
             // Произошла ошибка при копировании файла
-            // Обработайте ошибку по вашему усмотрению
         }
     }
 }

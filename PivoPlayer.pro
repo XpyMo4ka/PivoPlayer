@@ -9,11 +9,13 @@ INCLUDEPATH += $$PWD/music
 RESOURCES += resources.qrc
 
 SOURCES += \
+    SoundVisualisationWidget.cpp \
     buttons.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    SoundVisualisationWidget.h \
     mainwindow.h
 
 FORMS += \

@@ -23,6 +23,10 @@ MainWindow::MainWindow(QWidget *parent)
     QString configPath = QCoreApplication::applicationDirPath() + "settings.ini";
     settings = new QSettings(configPath, QSettings::IniFormat, this);
     ui->songname_label->setText(settings->value("currentSong").toString());
+
+    if(settings->value("musicDir").toString().isEmpty())
+        pickPath = QDir::homePath();
+    else pickPath = settings->value("musicDir").toString();
 }
 
 MainWindow::~MainWindow()
@@ -123,6 +127,7 @@ void MainWindow::setupSettings()
 {
     volume = settings->value("volume").toReal();
     songName = settings->value("currentSong").toString();
+
 }
 
 void MainWindow::saveSettings()
@@ -266,7 +271,7 @@ void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
 
          // Добавляем действия в контекстное меню
         QAction* action1 = contextMenu.addAction("Add to queue");
-         //QAction* action2 = contextMenu.addAction("Действие 2");
+        QAction* action2 = contextMenu.addAction("Delete");
 
          // Показываем контекстное меню в позиции курсора
         QAction* selectedAction = contextMenu.exec(ui->MusicList->viewport()->mapToGlobal(pos));
@@ -276,9 +281,28 @@ void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
              ui->QueueList->insertItem(0, selectedItem->text());
              queueNames.push_front(selectedItem->text());
 
-        } /*else if (selectedAction == action2) {
-             // Действие 2
-         }*/
+        }else if (selectedAction == action2) {
+            QDir musicDir("music");
+            for (QListWidgetItem *item : ui->MusicList->selectedItems())
+            {
+                if(songName != item->text())
+                    musicDir.remove(item->text());
+                else
+                {
+                    player->stop();
+                    musicDir.remove(item->text());
+                }
+                ui->MusicList->takeItem(ui->MusicList->row(item));
+                if (!queueNames.isEmpty() && queueNames.contains(item->text()))
+                {
+                    ui->QueueList->takeItem(queueNames.indexOf(item->text()));
+                    queueNames.removeAt(queueNames.indexOf(item->text()));
+
+                }
+            }
+
+
+         }
      }
 }
 

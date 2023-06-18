@@ -6,6 +6,7 @@
 #include "QList"
 #include "QSettings"
 #include <QMainWindow>
+//#include "SoundVisualisationWidget.h"
 #include <QMediaPlayer>
 #include <QAudioOutput>
 #include <QStringList>
@@ -79,6 +80,7 @@ private:
     QSettings *settings;
     float volume;
     qint64 currentSongTiming;
+    QString pickPath;
 
     QMediaPlayer *player;
     QAudioOutput *audioOutput;
