@@ -173,6 +173,8 @@ void MainWindow::on_MusicList_itemDoubleClicked(QListWidgetItem *item)
         player->stop();
         timer->stop();
         songName = item->text();
+        if(queueNames.isEmpty())
+            generateQueue();
         playSong();
     }
 }
