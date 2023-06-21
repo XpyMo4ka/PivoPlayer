@@ -198,6 +198,45 @@
      <string/>
     </property>
    </widget>
+   <widget class="QPushButton" name="addPlaylistButton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>550</y>
+      <width>71</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>new playlist</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pickPlaylistButton">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>550</y>
+      <width>71</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>pick playlist</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="setDefaultButton">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>550</y>
+      <width>61</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>default</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

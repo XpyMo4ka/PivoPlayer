@@ -5,6 +5,10 @@
 #include "qlistwidget.h"
 #include "QList"
 #include "QSettings"
+#include "playlist.h"
+#include "QMessageBox"
+#include "QInputDialog"
+#include "QMenu"
 #include <QMainWindow>
 //#include "SoundVisualisationWidget.h"
 #include <QMediaPlayer>
@@ -28,6 +32,7 @@ public:
     QLabel *timingLabel;
     QLabel *timeLeftLabel;
     QLabel *songnameLabel;
+    QStringList playlists;
 private slots:
     void on_MusicList_itemDoubleClicked(QListWidgetItem *item);
     void on_MusicList_customContextMenuRequested(const QPoint& pos);
@@ -45,6 +50,13 @@ private slots:
 
     void on_volumeSlider_valueChanged(int value);
     void on_QueueList_itemDoubleClicked(QListWidgetItem *item);
+
+    void on_addPlaylistButton_clicked();
+
+
+    void on_pickPlaylistButton_clicked();
+
+    void on_setDefaultButton_clicked();
 
 private:
     QTimer *timer;
@@ -65,9 +77,11 @@ private:
 
     QDir musicDir;
     QStringList getSongNamesFromFolder();
+    QStringList getSongNamesFromPlaylist(QString currentPlaylist);
     QStringList filters;
 
     QString songName;
+    QStringList getSongNames();
 
     void playPrevSong();
     void playNextSong();
@@ -89,5 +103,12 @@ private:
     bool isShuffle = false;
     bool isLoop = false;
     bool isSliderPressed;
+
+    Playlist *playlist;
+    QString currentPlaylist;
+    void getPlaylistsPath();
+    QStringList playlistNames;
+
+
 };
 #endif // MAINWINDOW_H

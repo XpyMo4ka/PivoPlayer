@@ -92,4 +92,43 @@ void MainWindow::on_nextButton_clicked()
     }
 }
 
+void MainWindow::on_addPlaylistButton_clicked()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, "Create playlist", "Enter playlist name:", QLineEdit::Normal, "", &ok);
+
+     if (ok && !text.isEmpty())
+     {
+         playlist = new Playlist(text);
+         playlists.append(text);
+     }
+}
+
+void MainWindow::on_pickPlaylistButton_clicked()
+{
+    QFileDialog dialog(this, "Pick a Playlist", QDir::currentPath(), "Playlist Files (*.m3u8)");
+
+    dialog.setFileMode(QFileDialog::ExistingFile);
+
+    QString playlistsDirPath = QDir::currentPath() + "/playlists";
+    dialog.setDirectory(playlistsDirPath);
+
+    if (dialog.exec())
+    {
+        QString filePath = dialog.selectedFiles().first();
+        currentPlaylist = filePath;
+        ui->MusicList->clear();
+        queueNames.clear();
+        ui->QueueList->clear();
+        ui->MusicList->addItems(getSongNamesFromPlaylist(currentPlaylist));
+    }
+}
+
+void MainWindow::on_setDefaultButton_clicked()
+{
+    ui->MusicList->clear();
+    currentPlaylist.clear();
+    ui->MusicList->addItems(getSongNames());
+}
+
 

@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     if(settings->value("musicDir").toString().isEmpty())
         pickPath = QDir::homePath();
     else pickPath = settings->value("musicDir").toString();
+
 }
 
 MainWindow::~MainWindow()
@@ -77,7 +78,9 @@ void MainWindow::playPrevSong()
     else if (isLoop)
     {
         if(lastSongNames.isEmpty())
-            lastSongNames = getSongNamesFromFolder();
+        {
+            lastSongNames = getSongNames();
+        }
         songName = lastSongNames.last();
         lastSongNames.pop_back();
         playSong();
@@ -86,7 +89,7 @@ void MainWindow::playPrevSong()
 
 void MainWindow::shuffleQueue()
 {
-    shuffledQueueNames = getSongNamesFromFolder();
+    shuffledQueueNames = getSongNames();
     shuffledQueueNames.contains(songName);
     QList<QString>::Iterator begin = shuffledQueueNames.begin();
     QList<QString>::Iterator end = shuffledQueueNames.end();
@@ -94,6 +97,13 @@ void MainWindow::shuffleQueue()
     std::random_shuffle(begin, end);
     ui->QueueList->addItems(shuffledQueueNames);
     queueNames = shuffledQueueNames;
+}
+
+QStringList MainWindow::getSongNames()
+{
+    if(currentPlaylist.isEmpty())
+        return getSongNamesFromFolder();
+    else return getSongNamesFromPlaylist(currentPlaylist);
 }
 
 void MainWindow::updateTimingLabels()
@@ -134,6 +144,7 @@ void MainWindow::saveSettings()
 {
     settings->setValue("volume",volume);
     settings->setValue("currentSong", songName);
+    settings->setValue("musicDir", pickPath);
     settings->sync();
 }
 
@@ -148,7 +159,7 @@ void MainWindow::playSong()
 
 void MainWindow::generateQueue()
 {
-    for (const QString &fileName : getSongNamesFromFolder())
+    for (const QString &fileName : getSongNames())
     {
         if(fileName != songName)
         {
@@ -263,22 +274,70 @@ QStringList MainWindow::getSongNamesFromFolder()
         return fileNames;
 }
 
+QStringList MainWindow::getSongNamesFromPlaylist(QString currentPlaylist)
+{
+    QString filePath = currentPlaylist;
+    QStringList fileNames;
+    QFile file(filePath);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream stream(&file);
+
+        // Пропускаем первую строку
+        if (!stream.atEnd()) {
+            stream.readLine();
+        }
+
+        while (!stream.atEnd()) {
+            QString line = stream.readLine();
+            fileNames.append(line);
+        }
+
+        file.close();
+    }
+    return fileNames;
+}
+
 void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
 {
+    playlists.clear();
     QListWidgetItem* selectedItem = ui->MusicList->itemAt(pos);
 
+    QList<QListWidgetItem*> selectedItems = ui->MusicList->selectedItems();
+       QStringList selectedSongs;
+
+       foreach (QListWidgetItem* item, selectedItems) {
+           selectedSongs << item->text();
+       }
+
      if (selectedItem && selectedItem->listWidget() == ui->MusicList) {
-         // Создаем контекстное меню
+
         QMenu contextMenu(this);
 
-         // Добавляем действия в контекстное меню
+
         QAction* action1 = contextMenu.addAction("Add to queue");
         QAction* action2 = contextMenu.addAction("Delete");
 
-         // Показываем контекстное меню в позиции курсора
+        QMenu playlistMenu("Add to playlist", this);
+        contextMenu.addMenu(&playlistMenu); // Добавление подменю в главное меню
+
+        QDir playlistsDir("playlists");
+        playlistsDir.setNameFilters(QStringList() << "*.m3u8");
+        playlistsDir.setSorting(QDir::Name);
+
+        QFileInfoList playlistFiles = playlistsDir.entryInfoList();
+        for (const QFileInfo& playlistInfo : playlistFiles)
+        {
+            QAction* action = playlistMenu.addAction(playlistInfo.fileName()); // Добавление действия в подменю
+            connect(action, &QAction::triggered, this, [this, action, selectedSongs]() {
+                QString selectedPlaylistName = action->text();
+                playlist->addSong(selectedSongs, selectedPlaylistName);
+            });
+        }
+
+
+
         QAction* selectedAction = contextMenu.exec(ui->MusicList->viewport()->mapToGlobal(pos));
 
-         // Обрабатываем выбранное действие
         if (selectedAction == action1) {
              ui->QueueList->insertItem(0, selectedItem->text());
              queueNames.push_front(selectedItem->text());
@@ -302,12 +361,7 @@ void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
 
                 }
             }
-
-
          }
+
      }
 }
-
-
-
-
