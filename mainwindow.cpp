@@ -108,8 +108,6 @@ QStringList MainWindow::getSongNames()
 
 void MainWindow::updateTimingLabels()
 {
-
-
     currentSongTiming = player->position();
     qint64 timeLeft = player->duration() - player->position();
     QTime currentTiming = QTime(0, 0, 0).addMSecs(currentSongTiming);  //format current time
@@ -330,11 +328,11 @@ void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
             QAction* action = playlistMenu.addAction(playlistInfo.fileName()); // Добавление действия в подменю
             connect(action, &QAction::triggered, this, [this, action, selectedSongs]() {
                 QString selectedPlaylistName = action->text();
+                QString playlistName = QFileInfo(selectedPlaylistName).baseName();
+                playlist = new Playlist(playlistName);
                 playlist->addSong(selectedSongs, selectedPlaylistName);
             });
         }
-
-
 
         QAction* selectedAction = contextMenu.exec(ui->MusicList->viewport()->mapToGlobal(pos));
 
