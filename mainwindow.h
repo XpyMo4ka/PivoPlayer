@@ -58,6 +58,8 @@ private slots:
 
     void on_setDefaultButton_clicked();
 
+    void on_searchBar_textChanged(const QString &arg1);
+
 private:
     QTimer *timer;
     void updateTimingLabels();

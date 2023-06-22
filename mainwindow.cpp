@@ -363,3 +363,12 @@ void MainWindow::on_MusicList_customContextMenuRequested(const QPoint& pos)
 
      }
 }
+
+void MainWindow::on_searchBar_textChanged(const QString &arg1)
+{
+    QStringList songNames = getSongNames();
+    QStringList filteredSongNames = songNames.filter(arg1, Qt::CaseInsensitive);
+    ui->MusicList->clear();
+    ui->MusicList->addItems(filteredSongNames);
+}
+
